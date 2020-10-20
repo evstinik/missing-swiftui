@@ -26,6 +26,7 @@ public struct ImagePickerViewModifier: ViewModifier {
                     pickedImage = (info?[.editedImage] as? UIImage)?.withUpOrientation()
                 }
                 UIKitImagePicker(sourceType: sourceType, mediaTypes: [kUTTypeImage as String], isPresented: $isPickingImage, pickedMediaWithInfo: info)
+                    .ignoresSafeArea()
             }
             .actionSheet(isPresented: $isPickingSourceType, content: {
                 ActionSheet(
