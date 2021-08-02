@@ -11,6 +11,7 @@ import MobileCoreServices
 public struct ImagePickerViewModifier: ViewModifier {
     @Binding var isPresented: Bool
     @Binding var pickedImage: UIImage?
+    var allowsEditing: Bool
     
     @State private var sourceType: UIImagePickerController.SourceType?
     @State private var isPickingSourceType = false
@@ -23,9 +24,9 @@ public struct ImagePickerViewModifier: ViewModifier {
                 let info = Binding<[UIImagePickerController.InfoKey: Any]?>(
                     get: { pickedInfo }) { (info) in
                     pickedInfo = info
-                    pickedImage = (info?[.editedImage] as? UIImage)?.withUpOrientation()
+                    pickedImage = (info?[allowsEditing ? .editedImage : .originalImage] as? UIImage)?.withUpOrientation()
                 }
-                UIKitImagePicker(sourceType: sourceType, mediaTypes: [kUTTypeImage as String], isPresented: $isPickingImage, pickedMediaWithInfo: info)
+                UIKitImagePicker(sourceType: sourceType, mediaTypes: [kUTTypeImage as String], allowsEditing: allowsEditing, isPresented: $isPickingImage, pickedMediaWithInfo: info)
                     .ignoresSafeArea()
             }
             .actionSheet(isPresented: $isPickingSourceType, content: {
@@ -72,10 +73,11 @@ public struct ImagePickerViewModifier: ViewModifier {
 }
 
 public extension View {
-    func imagePicker(_ isPresented: Binding<Bool>, pickedImage: Binding<UIImage?>) -> some View {
+    func imagePicker(_ isPresented: Binding<Bool>, pickedImage: Binding<UIImage?>, allowsEditing: Bool = false) -> some View {
         modifier(ImagePickerViewModifier(
             isPresented: isPresented,
-            pickedImage: pickedImage
+            pickedImage: pickedImage,
+            allowsEditing: allowsEditing
         ))
     }
 }
